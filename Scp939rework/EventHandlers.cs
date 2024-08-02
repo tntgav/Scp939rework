@@ -24,18 +24,17 @@ namespace Scp939rework
         [PluginEvent(ServerEventType.PlayerDamage)]
         public void PlayerDamage(PlayerDamageEvent ev)
         {
-            if (ev.DamageHandler.GetType() == typeof(Scp939DamageHandler) && ev.Player != null)
-            { //i think this works?
-                if (ev.Player.Role == PlayerRoles.RoleTypeId.Scp939)
-                {
-                    Custom939 instance = ev.Player.Get939OrNew(); //Player = attacker not victim
-                    Scp939DamageHandler handler = ev.DamageHandler as Scp939DamageHandler;
-                    if (handler.Scp939DamageType == Scp939DamageType.Claw && instance.Stealth >= 30)
-                    {
-                        instance.ModStealth(-30);
-                        handler.Damage *= 3f;
-                    }
-                }
+            if (ev.DamageHandler.GetType() != typeof(Scp939DamageHandler)) return;
+            if (ev.Player == null) return;
+            if (ev.Player.Role != PlayerRoles.RoleTypeId.Scp939) return;
+
+
+            Custom939 instance = ev.Player.Get939OrNew(); //Player = attacker not victim
+            Scp939DamageHandler handler = ev.DamageHandler as Scp939DamageHandler;
+            if (handler.Scp939DamageType == Scp939DamageType.Claw && instance.Stealth >= 30)
+            {
+                instance.ModStealth(-30);
+                handler.Damage *= 3f;
             }
         }
 

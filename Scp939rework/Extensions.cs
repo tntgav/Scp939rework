@@ -73,11 +73,10 @@ namespace Scp939rework
                     eff.DisableEffect();
                     eff.Intensity = 0;
                     eff.Duration = 0;
-                } else
-                {
-                    eff.Intensity = 1;
-                    eff.Duration = 0;
+                    return;
                 }
+                eff.Intensity = 1;
+                eff.Duration = 0;
             }
         }
 

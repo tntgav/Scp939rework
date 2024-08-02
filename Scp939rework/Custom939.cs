@@ -97,10 +97,13 @@ namespace Scp939rework
             BuiltText += $"<br><br><size=20><align=left>+Passive: Sacrificial Heal <br></size><align=left><size=15>Using amnestic cloud converts all hume shield into HP, at a {ratio} ratio.</size>";
             BuiltText += $"<br><br><size=20><align=left>+Passive: Speed {(_stealth > _maxstealth * 0.5f ? "<color=#00ff00>(Active)</color>" : "<color=#ff0000>(Inactive)</color>")}<br></size><align=left><size=15>Move notably faster while above 50% stealth</size>{linebreaks}";
             if (_stealth > 30) BuiltText += $"<size=20><align=right>Sneak Attack <color=#00ff00>(Ready)</color><br></size><align=right><size=15>Claw attacks deal heavy damage, but consume 30 stealth.</size><br>";
-            if (_stealth > 25 && _stealth < 50) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#ff0000>(Level 1)</color><br></size><align=right><size=15>Your pounce slows all nearby players</size>";
-            if (_stealth >= 50 && _stealth < 75) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#cc4400>(Level 2)</color><br></size><align=right><size=15>Your pounce slows all nearby players, and gives you AHP on hit.</size>";
-            if (_stealth >= 75 && _stealth < _maxstealth) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#77aa00>(Level 3)</color><br></size><align=right><size=15>Your pounce slows all nearby players, and gives you AHP and HP on hit.</size>";
-            if (_stealth == _maxstealth) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#00ff00>(Level 4)</color><br></size><align=right><size=15>Your pounce is <b>explosive</b>, slows all nearby players, and gives you AHP and HP on hit.</size>";
+
+            
+
+            if (_stealth >= 25 && _stealth < 50) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#ff0000>(Level 1)</color><br></size><align=right><size=15>Your pounce slows all nearby players</size>";
+            else if (_stealth >= 50 && _stealth < 75) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#cc4400>(Level 2)</color><br></size><align=right><size=15>Your pounce slows all nearby players, and gives you AHP on hit.</size>";
+            else if (_stealth >= 75 && _stealth < _maxstealth) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#77aa00>(Level 3)</color><br></size><align=right><size=15>Your pounce slows all nearby players, and gives you AHP and HP on hit.</size>";
+            else if (_stealth == _maxstealth) BuiltText += $"<br><size=20><align=right>Super Pounce<color=#00ff00>(Level 4)</color><br></size><align=right><size=15>Your pounce is <b>explosive</b>, slows all nearby players, and gives you AHP and HP on hit.</size>";
 
 
             Owner.SendHint(975, BuiltText, 0.5f);

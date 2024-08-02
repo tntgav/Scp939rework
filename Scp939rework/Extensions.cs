@@ -11,6 +11,13 @@ using System.Linq;
 using CustomPlayerEffects;
 using UnityEngine;
 using System.Collections.Generic;
+using InventorySystem.Items.ThrowableProjectiles;
+using InventorySystem.Items;
+using Object = UnityEngine.Object;
+using Footprinting;
+using InventorySystem.Items.Pickups;
+using Mirror;
+using PlayerStatsSystem;
 namespace Scp939rework
 {
     public static class Extensions
@@ -87,6 +94,27 @@ namespace Scp939rework
             foreach (Player p in nearestPlayers) { if (Vector3.Distance(plr.Position, p.Position) < lowest) { nearest = p; lowest = Vector3.Distance(plr.Position, p.Position); } }
 
             return nearest;
+        }
+
+        public static void Detonate(this Player owner, int amount = 1) //player-only override
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                ThrowableItem throwable = owner.ReferenceHub.inventory.CreateItemInstance(new ItemIdentifier(ItemType.GrenadeHE, ItemSerialGenerator.GenerateNext()), false) as ThrowableItem;
+
+                TimeGrenade grenade = Object.Instantiate(throwable.Projectile, owner.Position, Quaternion.identity) as TimeGrenade;
+                grenade.PreviousOwner = new Footprint(owner.ReferenceHub);
+                grenade.NetworkInfo = new PickupSyncInfo(ItemType.GrenadeHE, throwable.Weight, throwable.ItemSerial);
+                grenade._fuseTime = 0.05f;
+                NetworkServer.Spawn(grenade.gameObject);
+                grenade.ServerActivate();
+            }
+            
+        }
+
+        public static void AddAhp(this Player toahp, float amount)
+        {
+            toahp.GetStatModule<AhpStat>().ServerAddProcess(amount, float.MaxValue, 0, 1, 0, true);
         }
     }
 }

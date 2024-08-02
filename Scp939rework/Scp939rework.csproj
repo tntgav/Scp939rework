@@ -76,6 +76,7 @@
     <Compile Include="debugdmg.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Patches.cs" />
     <Compile Include="PluginEntryPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

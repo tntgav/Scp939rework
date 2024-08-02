@@ -11,6 +11,10 @@ using Mirror;
 using PluginAPI.Core;
 using HarmonyLib;
 using PlayerStatsSystem;
+using UnityEngine;
+using CustomPlayerEffects;
+using System.Runtime.CompilerServices;
+using MEC;
 
 namespace Scp939rework
 {
@@ -55,18 +59,54 @@ namespace Scp939rework
             }
         }
 
-        [HarmonyPatch(typeof(Scp939LungeAbility), nameof(Scp939LungeAbility.OnKeyDown))]
-        public static class lungemod
+        [PluginEvent(ServerEventType.Scp939CreateAmnesticCloud)]
+        public void HStoHP(Scp939CreateAmnesticCloudEvent ev)
         {
-            public static bool Prefix(Scp939LungeAbility __instance)
-            {
-                return true;
-            }
+            Custom939 instance = ev.Player.Get939OrNew();
+            float currenthume = ev.Player.GetStatModule<HumeShieldStat>().CurValue;
+            ev.Player.GetStatModule<HumeShieldStat>().CurValue = 0;
+            ev.Player.Health += currenthume / (200 / instance.MaxStealth);
+            //starts off at 2:1 ratio and increases for more max stealth
+        }
 
-            public static void Postfix(Scp939LungeAbility __instance)
+        [PluginEvent(ServerEventType.Scp939Lunge)]
+        public void CustomLunge(Scp939LungeEvent ev)
+        {
+            if (ev.State == Scp939LungeState.Triggered)
             {
-                Log.Info("detected?");
+                Custom939 instance = ev.Player.Get939OrNew();
+                float consumed = instance.Stealth;
+                instance.ModStealth(instance.Stealth * -1); //consume all stealth
+                instance.LungeData = consumed;
             }
+            if (ev.State == Scp939LungeState.LandHit || ev.State == Scp939LungeState.LandRegular || ev.State == Scp939LungeState.LandHarsh)
+            {
+                Custom939 instance = ev.Player.Get939OrNew();
+                float consumed = instance.LungeData;
+
+                if (consumed > 25)
+                {
+                    Player.GetPlayers().Where(p => Vector3.Distance(p.Position, ev.Player.Position) < 5 && p != ev.Player).ToList().ForEach(p => { p.Effect<Slowness>(40, 5); });
+                    // i know this is bad, but it just gives 40% slowness to all players within 5 meters
+                }
+
+                if (consumed > 50)
+                {
+                    Player.GetPlayers().Where(p => Vector3.Distance(p.Position, ev.Player.Position) < 10 && p != ev.Player).ToList().ForEach(p => { instance.Owner.AddAhp(30); });
+                }
+
+                if (consumed > 75)
+                {
+                    Player.GetPlayers().Where(p => Vector3.Distance(p.Position, ev.Player.Position) < 10).ToList().ForEach(p => { instance.Owner.Health += 25; });
+                }
+
+                if (consumed >= instance.MaxStealth)
+                {
+                    ev.Player.ReferenceHub.characterClassManager.GodMode = true;
+                    ev.Player.Detonate(3);
+                    Timing.CallDelayed(0.2f, () => { ev.Player.ReferenceHub.characterClassManager.GodMode = false; });
+                }
+            } 
         }
     }
 }
